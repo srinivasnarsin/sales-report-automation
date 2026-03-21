@@ -2,7 +2,8 @@ selenium
 webdriver-manager
 pandas
 sqlalchemy
+psycopg2-binary
 matplotlib
 weasyprint
 python-dotenv
-smtplib
+openpyxl
