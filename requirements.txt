@@ -1,0 +1,8 @@
+selenium
+webdriver-manager
+pandas
+sqlalchemy
+matplotlib
+weasyprint
+python-dotenv
+smtplib
