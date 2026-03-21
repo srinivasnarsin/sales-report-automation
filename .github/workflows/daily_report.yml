@@ -1,0 +1,33 @@
+name: Daily Sales Report
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 7:30 AM IST daily
+  workflow_dispatch:       # manual trigger button
+
+jobs:
+  download-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Run main script
+        env:
+          SOURCE_URL: ${{ secrets.SOURCE_URL }}
+          SOURCE_USERNAME: ${{ secrets.SOURCE_USERNAME }}
+          SOURCE_PASSWORD: ${{ secrets.SOURCE_PASSWORD }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python main.py

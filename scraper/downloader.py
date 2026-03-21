@@ -19,10 +19,10 @@ def download_file():
     prefs = {"download.default_directory": download_path}
     options.add_experimental_option("prefs", prefs)
 
-    # Uncomment when deploying to GitHub Actions
-    # options.add_argument("--headless")
-    # options.add_argument("--no-sandbox")
-    # options.add_argument("--disable-dev-shm-usage")
+    # No indentation here - these are at function level
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Chrome(
         service=Service(ChromeDriverManager().install()),
@@ -73,7 +73,7 @@ def download_file():
 
         # --- Step 3: Click pie chart icon in sidebar ---
         print("📊 Step 3: Clicking pie chart icon...")
-        time.sleep(3)
+        time.sleep(8)
 
         sidebar_icons = driver.find_elements(
             By.XPATH, "//div[contains(@class, 'tooltip-target')]"
@@ -129,7 +129,7 @@ def download_file():
         time.sleep(2)
         driver.save_screenshot("output/step5_yesterday_selected.png")
 
-# --- Step 6: Click Export to Excel (tableExportExcel) ---
+        # --- Step 6: Click Export to Excel ---
         print("📊 Step 6: Clicking Export to Excel...")
         time.sleep(3)
 
@@ -168,19 +168,17 @@ def download_file():
         time.sleep(3)
         driver.save_screenshot("output/step8_after_data_export.png")
 
-# --- Step 9: Wait for table to load then click download arrow ---
+        # --- Step 9: Click download arrow ---
         print("⬇️ Step 9: Clicking download arrow...")
-        time.sleep(5)  # wait for table to fully load
+        time.sleep(8)
         driver.save_screenshot("output/step9_modal_loaded.png")
 
-        # Find all download arrow buttons in the modal and click the first one
         download_arrows = driver.find_elements(
             By.XPATH, "//button[.//path[contains(@class, 'tilcb-fill')]]"
         )
         print(f"   Found {len(download_arrows)} download arrows")
 
         if not download_arrows:
-            # Try alternative - find by the SVG fill color
             download_arrows = driver.find_elements(
                 By.XPATH, "//button[contains(@class, 'rounded-[50%]')]"
             )
@@ -203,7 +201,7 @@ def download_file():
         files = [f for f in os.listdir(download_path) if f.endswith(".xlsx")]
         if not files:
             files = [f for f in os.listdir(download_path) if f.endswith(".csv")]
-        
+
         print(f"   Found {len(files)} files:")
         for f in files:
             print(f"   - {f}")
@@ -217,6 +215,7 @@ def download_file():
 
         print(f"   ✅ Downloaded: {latest}")
         return os.path.join(download_path, latest)
+
     except Exception as e:
         print(f"\n❌ Error: {e}")
         driver.save_screenshot("output/error_screenshot.png")
