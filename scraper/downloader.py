@@ -156,28 +156,18 @@ def download_file():
         driver.save_screenshot("output/step7_after_download_report.png")
 
 # --- Step 8: Click Data Export icon ---
+       # --- Step 8: Click Data Export icon ---
         print("📤 Step 8: Clicking Data Export icon...")
         time.sleep(8)
 
-        # Debug - print current URL and all li/button elements
         print(f"   Current URL: {driver.current_url}")
-        
-        # Print all elements with IDs
-        all_ids = driver.find_elements(By.XPATH, "//*[@id]")
-        print(f"   Found {len(all_ids)} elements with IDs:")
-        for el in all_ids[:20]:  # print first 20
-            print(f"   - {el.tag_name}: id='{el.get_attribute('id')}'")
 
-        # Try finding headerDataExport
-        exports = driver.find_elements(By.ID, "headerDataExport")
-        print(f"   Found {len(exports)} headerDataExport elements")
-
-        data_export_btn = wait.until(EC.element_to_be_clickable(
-            (By.ID, "headerDataExport")
-        ))
+        # Find and click directly with JavaScript - bypass clickable check
+        data_export_btn = driver.find_element(By.ID, "headerDataExport")
         driver.execute_script("arguments[0].click();", data_export_btn)
         print("   ✅ Clicked Data Export!")
 
+        time.sleep(5)
         # --- Step 9: Click download arrow ---
         print("⬇️ Step 9: Clicking download arrow...")
         time.sleep(8)
