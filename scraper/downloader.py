@@ -29,7 +29,7 @@ def download_file():
         options=options
     )
 
-    wait = WebDriverWait(driver, 15)
+    wait = WebDriverWait(driver, 30)
 
     try:
         # --- Step 1: Open website ---
@@ -155,9 +155,9 @@ def download_file():
         time.sleep(3)
         driver.save_screenshot("output/step7_after_download_report.png")
 
-        # --- Step 8: Click Data Export icon ---
+# --- Step 8: Click Data Export icon ---
         print("📤 Step 8: Clicking Data Export icon...")
-        time.sleep(2)
+        time.sleep(8)  # ← increase from 2 to 8
 
         data_export_btn = wait.until(EC.element_to_be_clickable(
             (By.ID, "headerDataExport")
