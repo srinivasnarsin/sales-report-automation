@@ -19,7 +19,6 @@ def download_file():
     prefs = {"download.default_directory": download_path}
     options.add_experimental_option("prefs", prefs)
 
-    # No indentation here - these are at function level
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
@@ -155,56 +154,71 @@ def download_file():
         time.sleep(3)
         driver.save_screenshot("output/step7_after_download_report.png")
 
-# --- Step 8: Click Data Export icon ---
-       # --- Step 8: Click Data Export icon ---
+        # --- Step 8: Click Data Export icon ---
         print("📤 Step 8: Clicking Data Export icon...")
         time.sleep(8)
 
         print(f"   Current URL: {driver.current_url}")
-
-        # Find and click directly with JavaScript - bypass clickable check
         data_export_btn = driver.find_element(By.ID, "headerDataExport")
         driver.execute_script("arguments[0].click();", data_export_btn)
         print("   ✅ Clicked Data Export!")
 
         time.sleep(5)
-        # --- Step 9: Click download arrow ---
+        driver.save_screenshot("output/step8_after_data_export.png")
+
+        # --- Step 9: Click download arrow for ENT-SALES report ---
         print("⬇️ Step 9: Clicking download arrow...")
         time.sleep(8)
         driver.save_screenshot("output/step9_modal_loaded.png")
 
-        download_arrows = driver.find_elements(
-            By.XPATH, "//button[.//path[contains(@class, 'tilcb-fill')]]"
+        # Find all rows in the data export modal
+        # Look for the ENT-SALES file specifically
+        rows = driver.find_elements(
+            By.XPATH, "//tr[contains(., 'ENT') or contains(., 'SALES-ITEM') or contains(., 'ent')]"
         )
-        print(f"   Found {len(download_arrows)} download arrows")
+        print(f"   Found {len(rows)} ENT-SALES rows in modal")
 
-        if not download_arrows:
+        if rows:
+            # Click the download arrow in the matching row
+            arrow = rows[0].find_element(
+                By.XPATH, ".//button[contains(@class, 'rounded-[50%]')]"
+            )
+            driver.execute_script("arguments[0].click();", arrow)
+            print("   ✅ Clicked download arrow for ENT-SALES report!")
+        else:
+            # Fallback - click first download arrow
+            print("   ⚠️ ENT-SALES row not found, clicking first arrow...")
             download_arrows = driver.find_elements(
                 By.XPATH, "//button[contains(@class, 'rounded-[50%]')]"
             )
             print(f"   Found {len(download_arrows)} round buttons")
-
-        if not download_arrows:
-            driver.save_screenshot("output/error_no_arrow.png")
-            raise Exception("No download arrow found!")
-
-        driver.execute_script("arguments[0].click();", download_arrows[0])
-        print("   ✅ Clicked download arrow!")
+            driver.execute_script("arguments[0].click();", download_arrows[0])
+            print("   ✅ Clicked first download arrow!")
 
         # --- Step 10: Wait for download ---
         print("⏳ Step 10: Waiting for file to download...")
-        time.sleep(5)
+        time.sleep(8)
         driver.save_screenshot("output/step10_after_download.png")
 
         # --- Step 11: Get downloaded file ---
         print("📂 Step 11: Getting downloaded file...")
-        files = [f for f in os.listdir(download_path) if f.endswith(".xlsx")]
-        if not files:
-            files = [f for f in os.listdir(download_path) if f.endswith(".csv")]
 
-        print(f"   Found {len(files)} files:")
+        # Look specifically for ENT-SALES file
+        files = [f for f in os.listdir(download_path)
+                 if ("ENT-SALES" in f.upper() or "SALES-ITEM" in f.upper())
+                 and "cleaned" not in f
+                 and (f.endswith(".xlsx") or f.endswith(".csv"))]
+
+        print(f"   Found {len(files)} ENT-SALES files:")
         for f in files:
             print(f"   - {f}")
+
+        if not files:
+            # Fallback - get latest file
+            print("   ⚠️ No ENT-SALES file found, using latest file...")
+            files = [f for f in os.listdir(download_path)
+                     if (f.endswith(".xlsx") or f.endswith(".csv"))
+                     and "cleaned" not in f]
 
         if not files:
             raise Exception("No downloaded file found in output folder!")
