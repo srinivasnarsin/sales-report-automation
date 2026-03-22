@@ -16,6 +16,13 @@ def download_file():
     options = webdriver.ChromeOptions()
 
     download_path = os.path.abspath("output")
+    # --- Clean output folder before starting ---
+    print("🧹 Cleaning output folder...")
+    for f in os.listdir(download_path):
+        if f.endswith(".csv") or f.endswith(".xlsx"):
+            os.remove(os.path.join(download_path, f))
+            print(f"   Deleted: {f}")
+    
     prefs = {"download.default_directory": download_path}
     options.add_experimental_option("prefs", prefs)
 
