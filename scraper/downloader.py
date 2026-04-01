@@ -23,11 +23,19 @@ def download_file():
     prefs = {"download.default_directory": download_path}
     options.add_experimental_option("prefs", prefs)
 
-    # options.add_argument("--headless=new")
+    # ============================================================
+    # ✅ REQUIRED FIX FOR GITHUB ACTIONS
+    # ============================================================
+    options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-software-rasterizer")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-features=VizDisplayCompositor")
+    options.add_argument("--remote-debugging-port=9222")
     options.add_argument("--window-size=1920,1080")
+    options.add_argument("--disable-zygote")
 
     driver = webdriver.Chrome(
         service=Service(ChromeDriverManager().install()),
@@ -78,7 +86,7 @@ def download_file():
         driver.save_screenshot(os.path.join(download_path, "step2_after_login.png"))
         print("   ✅ Login done!")
 
-        # --- Step 3: Pie chart icon ---
+        # --- Step 3: Pie chart ---
         print("📊 Step 3: Clicking pie chart icon...")
 
         sidebar_icons = []
@@ -133,7 +141,7 @@ def download_file():
         time.sleep(2)
         driver.save_screenshot(os.path.join(download_path, "step5_yesterday_selected.png"))
 
-        # --- Step 6: Export to Excel ---
+        # --- Step 6: Export ---
         print("📊 Step 6: Clicking Export to Excel...")
         time.sleep(3)
 
@@ -168,7 +176,7 @@ def download_file():
         driver.save_screenshot(os.path.join(download_path, "step8_after_data_export.png"))
 
         # ============================================================
-        # 🔥  STEP 9 UPDATED — USE FIRST DATA ROW (index 1)
+        # 🔥 STEP 9 — FIRST DATA ROW (index 1), debugging added
         # ============================================================
 
         print("⬇️ Step 9: Finding Sales Report row in Data Export modal...")
@@ -202,18 +210,15 @@ def download_file():
                 print("   ❌ No rows found!")
                 return False
 
-            # 🔥 NEW LOGIC — SELECT FIRST DATA ROW (NOT HEADER)
+            # 🔥 FIRST DATA ROW (skip header)
             row = all_rows[1] if len(all_rows) > 1 else all_rows[0]
 
-            # Debug - print full row text
             print(f"   Row 1 full text: '{row.text[:200]}'")
 
-            # List elements with text
             all_elements = row.find_elements(By.XPATH, ".//*[normalize-space(text())]")
             for el in all_elements[:10]:
                 print(f"     tag={el.tag_name} class='{el.get_attribute('class')[:40]}' text='{el.text[:50]}'")
 
-            # Check for COMPLETED status
             completed_labels = row.find_elements(
                 By.XPATH, ".//*[normalize-space(text())='COMPLETED']"
             )
@@ -224,7 +229,6 @@ def download_file():
 
             print("   ✅ Row 1 — COMPLETED!")
 
-            # Click download button
             download_btn = row.find_element(By.XPATH, ".//button[contains(@class,'rounded-[50%]')]")
             driver.execute_script("arguments[0].click();", download_btn)
             print("   ✅ Clicked download on row 1!")
@@ -257,7 +261,7 @@ def download_file():
         time.sleep(12)
         driver.save_screenshot(os.path.join(download_path, "step10_after_download.png"))
 
-        # --- Step 11: Locate the downloaded file ---
+        # --- Step 11: Locate downloaded file ---
         print("📂 Step 11: Getting downloaded file...")
         files = [
             f for f in os.listdir(download_path)
