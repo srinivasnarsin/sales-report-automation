@@ -75,12 +75,14 @@ def download_file():
         time.sleep(3)
 
         try:
-            log_me_in = driver.find_element(By.XPATH, "//button[contains(text(), 'Log me In')]")
-            print("   🔄 Found 'Log me In' button, clicking...")
+            log_me_in = driver.find_element(
+                By.XPATH, "//button[contains(text(), 'Log me In') or contains(text(), 'Login Here')]"
+            )
+            print(f"   🔄 Found second login button: '{log_me_in.text}', clicking...")
             log_me_in.click()
-            print("   ✅ Clicked Log me In")
+            print("   ✅ Clicked second login button")
         except:
-            print("   ℹ️ No 'Log me In' button, continuing...")
+            print("   ℹ️ No second login button, continuing...")
 
         time.sleep(5)
         driver.save_screenshot(os.path.join(download_path, "step2_after_login.png"))
